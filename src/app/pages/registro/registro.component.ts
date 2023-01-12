@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
+
+import { AuthService } from '../../services/auth.service';
 import { UsuarioModel } from '../../models/usuario.model';
+
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-registro',
@@ -10,7 +16,8 @@ export class RegistroComponent implements OnInit {
 
   usuario: UsuarioModel = new UsuarioModel;
 
-  constructor() {
+  constructor( private auth: AuthService,
+               private router: Router) {
   }
 
   ngOnInit() {
@@ -20,9 +27,28 @@ export class RegistroComponent implements OnInit {
 
     if ( form.invalid ) { return; }
 
-    console.log('formulaio enviado');
-    console.log(this.usuario);
-    console.log(form);
+    Swal.fire({
+      allowOutsideClick: false,
+      icon: 'info',
+      text: 'Espere por favor...'
+    });
+    Swal.showLoading();
+
+    this.auth.usuarioNuevo( this.usuario )
+    .subscribe( resp => {
+      console.log(resp);
+
+      Swal.close();
+      this.router.navigateByUrl('/home');
+
+    }, (err) => {
+      console.log(err.error.error.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Ya existe una cuenta con este Email',
+        text: err.error.error.message
+      });
+    });
   }
 
 }
