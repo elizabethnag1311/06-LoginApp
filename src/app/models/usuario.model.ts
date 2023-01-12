@@ -1,5 +1,5 @@
 
-export class UsuarioModel {
+export class UsuarioModel{
 
   email!: string;
   password!: string;
